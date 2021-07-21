@@ -44,19 +44,22 @@ if __name__ == '__main__':
     processID = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
     processes = []
     
-    if sys.argc != 8:
+    if len(sys.argv) != 8:
         raise Exception("invalid args number")
-    process_num = sys.argv[1]
-    seed = sys.argv[2]
-    Lambda = sys.argv[3]
-    upper_bound = sys.argv[4]
-    t_cs = sys.argv[5]
-    alpha = sys.argv[6]
-    t_slice = sys.argv[7]
+    process_num = int(sys.argv[1])
+    seed = int(sys.argv[2])
+    Lambda = float(sys.argv[3])
+    upper_bound = int(sys.argv[4])
+    t_cs = int(sys.argv[5])
+    alpha = float(sys.argv[6])
+    t_slice = int(sys.argv[7])
     rand = Rand48(seed)
     for i in range(process_num):
         arrival = next_exp(seed, Lambda, upper_bound)
-        CPU_burst = math.ceil(rand.drand * 100)
-        process = Burst(processID[i], arrival, )
+        CPU_burst = math.ceil(rand.drand() * 100)
+        process = Burst(processID[i], arrival, CPU_burst)
         processes.append(process)
+        print(processID[i])
+        print(arrival)
+        print(CPU_burst)
         
