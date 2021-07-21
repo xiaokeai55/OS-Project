@@ -41,7 +41,6 @@ def next_exp(seed, Lambda, upper):
 # argv[6]: For the SJF and SRT algorithms, the constant α
 # argv[7]: For the RR algorithm, define the time slice value, t_slice, measured in milliseconds
 if __name__ == '__main__':
-    processID = ['A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
     processes = []
     
     if len(sys.argv) != 8:
@@ -57,9 +56,9 @@ if __name__ == '__main__':
     for i in range(process_num):
         arrival = next_exp(seed, Lambda, upper_bound)
         CPU_burst = math.ceil(rand.drand() * 100)
-        process = Burst(processID[i], arrival, CPU_burst)
+        process = Burst(chr(65+i), arrival, CPU_burst)
         processes.append(process)
-        print(processID[i])
+        print(chr(65+i))
         print(arrival)
         print(CPU_burst)
         
