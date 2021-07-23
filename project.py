@@ -1,4 +1,5 @@
 from burst import*
+from CPUburst import*
 import sys
 import math
 
@@ -53,12 +54,17 @@ if __name__ == '__main__':
     alpha = float(sys.argv[6])
     t_slice = int(sys.argv[7])
     rand = Rand48(seed)
+    bursts = []
     for i in range(process_num):
         arrival = next_exp(seed, Lambda, upper_bound)
-        CPU_burst = math.ceil(rand.drand() * 100)
-        process = Burst(chr(65+i), arrival, CPU_burst)
+        burst_num = math.ceil(rand.drand() * 100)
+        for j in range(burst_num - 1):
+            bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
+            bursts.append(CPUburst('IO', 10 * math.ceil(next_exp(seed, Lambda, upper_bound))))
+        bursts.append('CPU', math.ceil(next_exp(seed, Lambda, upper_bound)))
+        process = Burst(chr(65+i), arrival, burst_num)
         processes.append(process)
         print(chr(65+i))
         print(arrival)
-        print(CPU_burst)
+        print(burst_num)
         
