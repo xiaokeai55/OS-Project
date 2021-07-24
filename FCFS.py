@@ -1,9 +1,10 @@
 from burst import*
 class FCFS(object):
-    def __init__(self, processes):
+    def __init__(self, processes, t_cs):
         self.processes = processes
         self.readyQ = []
-        self.total = 0    
+        self.total = 0
+        self.t_cs = t_cs
     
     def checkQ(self):
         if len(self.readyQ) == 0:
@@ -16,7 +17,8 @@ class FCFS(object):
             return ret
         
     def run(self):
-        print('time 0ms: Simulator started for FCFS [Q empty]')
+        time = 0
+        print('time {}ms: Simulator started for FCFS [Q{}]'.format(time, self.checkQ()))
         time = self.processes.getArrival()
         bursts = self.processes.getBursts()
         self.total = len(bursts) // 2
@@ -24,8 +26,8 @@ class FCFS(object):
         current = self.readyQ[0]
         print('time {}ms: Process {} arrived; added to ready queue [Q{}]'.format(time, current, self.checkQ()))
         self.readyQ.pop(0)
-        for i in range(len(bursts)):
-            time += 2
+        for i in range(len(bursts) // 2):
+            time += self.t_cs
             print('time {}ms: Process {} started using the CPU for {}ms burst [Q{}]'.format(time, current, bursts[0].getTime(), self.checkQ()))
             time += bursts[i].getTime()
             self.total-=1
@@ -35,11 +37,11 @@ class FCFS(object):
             print('time {}ms: Process {} completed I/O; added to ready queue [Q{}]'.format(time, current, self.checkQ()))
             current = self.readyQ[0]
             self.readyQ.pop(0)
-        time += 2
+        time += self.t_cs
         print('time {}ms: Process {} started using the CPU for {}ms burst [Q{}]'.format(time, current, bursts[0].getTime(), self.checkQ()))
         time += bursts[-1].getTime()
         self.total-=1
         print('time {}ms: Process {} terminated [Q{}]'.format(time, current, self.checkQ()))
-        time += 2
+        time += self.t_cs
         print('time {}ms: Simulator ended for FCFS [Q{}]'.format(time, self.checkQ()))
     

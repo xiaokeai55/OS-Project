@@ -7,7 +7,7 @@ import math
 #def next_exp():
     
 class Rand48(object):
-    def __init__(self, seed = 0):
+    def __init__(self, seed):
         self.n = seed
 
     def seed(self, seed):
@@ -25,9 +25,10 @@ class Rand48(object):
 
 def next_exp(seed, Lambda, upper):
     rand = Rand48(seed)
+    rand.srand(seed)
     while(True):
         r = rand.drand()
-        x = -math.log(r/Lambda)
+        x = -math.log(r)/Lambda
         if x <= upper:
             return x
     
@@ -70,6 +71,6 @@ if __name__ == '__main__':
     
         
     #FCFS
-    #fcfs = FCFS(processes[0]) 
+    #fcfs = FCFS(processes[0], t_cs) 
     #fcfs.run()
     
