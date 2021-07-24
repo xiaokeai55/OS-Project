@@ -7,7 +7,7 @@ import math
 #def next_exp():
     
 class Rand48(object):
-    def __init__(self, seed):
+    def __init__(self, seed = 0):
         self.n = seed
 
     def seed(self, seed):
@@ -27,9 +27,9 @@ def next_exp(seed, Lambda, upper):
     rand = Rand48(seed)
     while(True):
         r = rand.drand()
-        x = -math.log(r)
+        x = -math.log(r/Lambda)
         if x <= upper:
-            return math.floor(x/Lambda)
+            return x
     
         
 
@@ -55,10 +55,12 @@ if __name__ == '__main__':
     alpha = float(sys.argv[6])
     t_slice = int(sys.argv[7])
     rand = Rand48(seed)
+    rand.srand(seed)
     bursts = []
     for i in range(process_num):
-        arrival = next_exp(seed, Lambda, upper_bound)
+        arrival = math.floor(next_exp(seed, Lambda, upper_bound))
         burst_num = math.ceil(rand.drand() * 100)
+        print(burst_num)
         for j in range(burst_num - 1):
             bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
             bursts.append(CPUburst('IO', 10 * math.ceil(next_exp(seed, Lambda, upper_bound))))
@@ -68,6 +70,6 @@ if __name__ == '__main__':
     
         
     #FCFS
-    fcfs = FCFS(processes[0])
-    fcfs.run()
+    #fcfs = FCFS(processes[0]) 
+    #fcfs.run()
     
