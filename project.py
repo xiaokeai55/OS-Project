@@ -1,5 +1,6 @@
 from burst import*
 from CPUburst import*
+from FCFS import*
 import sys
 import math
 
@@ -61,10 +62,12 @@ if __name__ == '__main__':
         for j in range(burst_num - 1):
             bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
             bursts.append(CPUburst('IO', 10 * math.ceil(next_exp(seed, Lambda, upper_bound))))
-        bursts.append('CPU', math.ceil(next_exp(seed, Lambda, upper_bound)))
-        process = Burst(chr(65+i), arrival, burst_num)
+        bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
+        process = Burst(chr(65+i), arrival, burst_num, bursts)
         processes.append(process)
-        print(chr(65+i))
-        print(arrival)
-        print(burst_num)
+    
         
+    #FCFS
+    fcfs = FCFS(processes[0])
+    fcfs.run()
+    
