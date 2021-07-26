@@ -1,7 +1,7 @@
 from burst import*
 from CPUburst import*
 from FCFS import*
-import random
+from RR import*
 import sys
 import math
 
@@ -30,8 +30,18 @@ def next_exp(seed, Lambda, upper):
         x = -math.log(r)/Lambda
         if x <= upper:
             return x
+
+def simout(algo):
+    f = open('simout.txt', 'w')
+    f.write('Algorithm FCFS\n')
+    f.write('-- average CPU burst time: {:.3f} ms\n'.format(algo.getcpu()))
+    f.write('-- average wait time: {:.3f} ms\n'.format(algo.getwait()))
+    f.write('-- average turnaround time: {:.3f} ms\n'.format(algo.getturn()))
+    f.write('-- total number of context switches: {}\n'.format(algo.getcs()))
+    f.write('-- total number of preemptions: {}\n'.format(algo.getpreemp()))
+    f.write('-- CPU utilization: {:.3f}%\n'.format(algo.getutilization()))
+    f.close()
     
-        
 
 
 # argv[1]: Define n as the number of processes to simulate
@@ -71,17 +81,20 @@ if __name__ == '__main__':
         print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)\n'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
         
         #FCFS
-        fcfs = FCFS(processes[0], t_cs) 
+        fcfs = FCFS(processes[i], t_cs) 
         fcfs.run()
-        
+        simout(fcfs)
         print()
         
         #SJF
         
-        print()
+        #print()
         
         #SRT
         
-        print()
+        #print()
         
         #RR
+        rr = RR(processes[i], t_cs, t_slice)
+        rr.run()
+        
