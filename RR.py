@@ -7,6 +7,7 @@ class RR(object):
         self.total = 0
         self.t_cs = t_cs//2
         self.t_slice = t_slice
+        self.current = 0
         #simout
         self.cpu_time = 0
         self.turnaround_time = 0
@@ -29,10 +30,10 @@ class RR(object):
     def run(self):
         time = 0
         print('time {}ms: Simulator started for RR with time slice {}ms [Q {}]'.format(time, self.t_slice, self.checkQ()))
-        time = self.processes.getArrival()
-        bursts = self.processes.getBursts()
-        self.total = self.processes.getBurstNum()
-        self.readyQ.append(self.processes.getName())
+        time = self.processes[self.current].getArrival()
+        bursts = self.processes[self.current].getBursts()
+        self.total = self.processes[self.current].getBurstNum()
+        self.readyQ.append(self.processes[self.current].getName())
         current = self.readyQ[0]
         print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(time, current, self.checkQ()))
         self.readyQ.pop(0)
@@ -49,7 +50,7 @@ class RR(object):
                     time += bursts[i].getTime()
                     self.total-=1
                 else:
-                    self.readyQ.append(self.processes.getName())
+                    self.readyQ.append(self.processes[self.current].getName())
                     if i < 2: i = 0
                     else: i -= 2
                     continue
@@ -63,7 +64,7 @@ class RR(object):
             self.wait_time += bursts[i+1].getTime()
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(time, current, block, self.checkQ()))
             time = block
-            self.readyQ.append(self.processes.getName())
+            self.readyQ.append(self.processes[self.current].getName())
             print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(time, current, self.checkQ()))
             current = self.readyQ[0]
             self.readyQ.pop(0)
@@ -84,13 +85,13 @@ class RR(object):
         self.cpu_utilization = self.cpu_time/time*100
         
     def getcpu(self):
-        return self.cpu_time/self.processes.getBurstNum()
+        return self.cpu_time/self.processes[self.current].getBurstNum()
     
     def getturn(self):
-        return self.turnaround_time/self.processes.getBurstNum()
+        return self.turnaround_time/self.processes[self.current].getBurstNum()
     
     def getwait(self):
-        return self.wait_time/self.processes.getBurstNum()
+        return self.wait_time/self.processes[self.current].getBurstNum()
     
     def getcs(self):
         return self.cs_num

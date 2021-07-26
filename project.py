@@ -80,21 +80,21 @@ if __name__ == '__main__':
     for i in range(process_num):
         print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)\n'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
         
-        #FCFS
-        fcfs = FCFS(processes[i], t_cs) 
-        fcfs.run()
-        simout(fcfs)
-        print()
-        
-        #SJF
-        
-        #print()
-        
-        #SRT
-        
-        #print()
-        
-        #RR
-        rr = RR(processes[i], t_cs, t_slice)
-        rr.run()
+    #FCFS
+    fcfs = FCFS(processes, t_cs) 
+    fcfs.run()
+    simout(fcfs)
+    print()
+    
+    #SJF
+    
+    #print()
+    
+    #SRT
+    
+    #print()
+    
+    #RR
+    rr = RR(processes, t_cs, t_slice)
+    rr.run()
         
