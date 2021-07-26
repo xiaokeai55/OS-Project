@@ -1,6 +1,7 @@
 from burst import*
 from CPUburst import*
 from FCFS import*
+import random
 import sys
 import math
 
@@ -24,8 +25,6 @@ class Rand48(object):
         return self.next() / 2 ** 48
 
 def next_exp(seed, Lambda, upper):
-    rand = Rand48(seed)
-    rand.srand(seed)
     while(True):
         r = rand.drand()
         x = -math.log(r)/Lambda
@@ -58,19 +57,31 @@ if __name__ == '__main__':
     rand = Rand48(seed)
     rand.srand(seed)
     bursts = []
-    for i in range(process_num):
+    for _ in range(process_num):
         arrival = math.floor(next_exp(seed, Lambda, upper_bound))
         burst_num = math.ceil(rand.drand() * 100)
-        print(burst_num)
-        for j in range(burst_num - 1):
+        for _ in range(burst_num - 1):
             bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
             bursts.append(CPUburst('IO', 10 * math.ceil(next_exp(seed, Lambda, upper_bound))))
         bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
         process = Burst(chr(65+i), arrival, burst_num, bursts)
         processes.append(process)
     
+    for i in range(process_num):
+        print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)\n'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
         
-    #FCFS
-    #fcfs = FCFS(processes[0], t_cs) 
-    #fcfs.run()
-    
+        #FCFS
+        fcfs = FCFS(processes[0], t_cs) 
+        fcfs.run()
+        
+        print()
+        
+        #SJF
+        
+        print()
+        
+        #SRT
+        
+        print()
+        
+        #RR

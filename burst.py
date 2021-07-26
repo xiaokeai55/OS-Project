@@ -8,6 +8,9 @@ class Burst(object):
     def getName(self):
         return self.id
     
+    def getBurstNum(self):
+        return self.cpu
+    
     def getBursts(self):
         return self.bursts
     
