@@ -1,5 +1,4 @@
-from burst import*
-from CPUburst import*
+from Process import*
 from FCFS import*
 from RR import*
 import sys
@@ -67,14 +66,14 @@ if __name__ == '__main__':
     rand = Rand48(seed)
     rand.srand(seed)
     bursts = []
-    for _ in range(process_num):
+    for i in range(process_num):
         arrival = math.floor(next_exp(seed, Lambda, upper_bound))
         burst_num = math.ceil(rand.drand() * 100)
         for _ in range(burst_num - 1):
-            bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
-            bursts.append(CPUburst('IO', 10 * math.ceil(next_exp(seed, Lambda, upper_bound))))
-        bursts.append(CPUburst('CPU', math.ceil(next_exp(seed, Lambda, upper_bound))))
-        process = Burst(chr(65+i), arrival, burst_num, bursts)
+            bursts.append(math.ceil(next_exp(seed, Lambda, upper_bound)))
+            bursts.append(10 * math.ceil(next_exp(seed, Lambda, upper_bound)))
+        bursts.append(math.ceil(next_exp(seed, Lambda, upper_bound)))
+        process = Process(chr(65+i), arrival, burst_num, bursts)
         processes.append(process)
     
     for i in range(process_num):
@@ -95,6 +94,6 @@ if __name__ == '__main__':
     #print()
     
     #RR
-    rr = RR(processes, t_cs, t_slice)
-    rr.run()
+    #rr = RR(processes, t_cs, t_slice)
+    #rr.run()
         
