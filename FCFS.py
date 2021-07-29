@@ -12,10 +12,10 @@ class FCFS(object):
         self.t_cs = t_cs//2
         self.time = 0
         self.index = 0
-        self.current = self.processes[0]
-        self.bursts = self.processes[0].getBursts()
+        self.current = deepcopy(self.processes[0])
+        self.bursts = deepcopy(self.processes[0].getBursts())
         if self.process_num > 1:
-            self.next_arr = self.processes[1]
+            self.next_arr = deepcopy(self.processes[1])
         else:
             self.next_arr = -1
         #simout
@@ -25,6 +25,8 @@ class FCFS(object):
         self.cs_num = 0
         self.preemp = 0
         self.cpu_utilization = 0
+        self.nextblock = []
+        self.r = False
     
     def checkQ(self):
         if len(self.readyQ) == 0:
@@ -38,53 +40,85 @@ class FCFS(object):
             return ret
         
     def checkArrival(self, time):
-        if self.next_arr != -1 and self.next_arr.isfirst() and self.next_arr.getArrival() < time:
-            self.readyQ.append(self.next_arr)
-            print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.next_arr.getArrival(), self.next_arr, self.checkQ()))
-            self.next_arr.notfirst()
+        if self.next_arr != -1 and self.next_arr.getArrival() < time:
+            if self.next_arr.isfirst():
+                self.readyQ.append(self.next_arr)
+                print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.next_arr.getArrival(), self.next_arr, self.checkQ()))
+                self.next_arr.notfirst()
                 
     def switch(self, count):
         self.current.setCount(count)
-        self.current, self.next_arr = self.next_arr, self.current
+        #print('switch', self.current)
+        #print(self.next_arr)
+        tmp = deepcopy(self.current)
+        self.current = deepcopy(self.next_arr)
+        self.next_arr = tmp
         self.index = self.current.getindex()
-        self.bursts = self.current.getBursts()
-        i = self.current.getCount()
-        return i
+        self.bursts = deepcopy(self.current.getBursts())
+        ret = self.current.getCount()
+        return ret
         
+    def checkIO(self, count, time):
+        #print('checkIO', self.current)
+        #print(self.next_arr)
+        ret = count
+        if len(self.nextblock) != 0 and time >= self.nextblock[0]:
+            if not self.r: 
+                self.time = deepcopy(self.nextblock[0])
+                self.time += self.t_cs
+            self.readyQ.append(self.next_arr)
+            print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0], self.next_arr, self.checkQ()))
+            self.nextblock.pop(0)
+            self.next_arr.index+=1
+            ret = self.next_arr.index
+        return ret
+    
     def run(self):
         print('time {}ms: Simulator started for FCFS [Q {}]'.format(self.time, self.checkQ()))
         self.time = self.processes[0].getArrival()
         self.readyQ.append(self.processes[0])
-        self.current = self.readyQ[0]
+        self.current = deepcopy(self.readyQ[0])
         print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.time, self.current, self.checkQ()))
-        self.readyQ.pop(0)
+        self.current.notfirst()
         i = 0
-        while i < len(self.bursts) - 1:
+        while i < 10:
             self.time += self.t_cs
             self.checkArrival(self.time)
-            print('time {}ms: Process {} started using the CPU for {}ms burst [Q {}]'.format(self.time, self.current, self.bursts[i], self.checkQ()))
+            i = self.checkIO(i, self.time)
+            if(len(self.readyQ) == 0):
+                self.time = self.nextblock[0]
+                i = self.switch(i)
+                i = self.checkIO(i, self.time)
+                i = self.switch(i)
+                i += 1
+            self.readyQ.pop(0)
+            print('time {}ms: Process {} started using the CPU for {}ms burst [Q {}]'\
+                  .format(self.time, self.current, self.bursts[i], self.checkQ()))
+            self.r = True
             self.cpu_time += self.bursts[i]
             self.checkArrival(self.time + self.t_cs)
+            i = self.checkIO(i, self.time + self.bursts[i])
             self.time += self.bursts[i]
-            self.total[self.index]-=1
+            self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time + self.t_cs)
-            if self.total[self.index] == 1: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[self.index], self.checkQ()))
-            else: print('time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.total[self.index], self.checkQ()))
+            if self.total[ord(self.current.getName())-65] == 1: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[self.index], self.checkQ()))
+            else: print('time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
+            self.r = False
             i += 1
             block = self.time + self.bursts[i] + self.t_cs
             self.wait_time += self.bursts[i]
             self.current.update_arrival(block)
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
+            self.nextblock.append(block)
             self.checkArrival(block)
-            if self.checkQ != 'empty':
+            if self.next_arr != -1:
                 i = self.switch(i)
                 self.time += self.t_cs
                 continue
             self.time = block
-            self.readyQ.append(self.processes[self.index])
+            self.readyQ.append(self.processes[ord(self.current.getName())-65])
             print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.time, self.current, self.checkQ()))
-            self.current = self.readyQ[0]
-            self.readyQ.pop(0)
+            self.current = deepcopy(self.readyQ[0])
             i += 1
             self.current.setCount = i
         self.time += self.t_cs
@@ -93,7 +127,7 @@ class FCFS(object):
         self.time += self.bursts[-1]
         self.cpu_time += self.bursts[-1]
         self.turnaround_time = self.cpu_time + self.wait_time
-        self.total[self.index]-=1
+        self.total[ord(self.current.getName())-65]-=1
         self.checkArrival(self.time)
         print('time {}ms: Process {} terminated [Q {}]'.format(self.time, self.current, self.checkQ()))
         self.time += self.t_cs
@@ -101,13 +135,13 @@ class FCFS(object):
         self.cpu_utilization = self.cpu_time/self.time*100
         
     def getcpu(self):
-        return self.cpu_time/self.processes[self.index].getBurstNum()
+        return self.cpu_time/self.processes[ord(self.current.getName())-65].getBurstNum()
     
     def getturn(self):
-        return self.turnaround_time/self.processes[self.index].getBurstNum()
+        return self.turnaround_time/self.processes[ord(self.current.getName())-65].getBurstNum()
     
     def getwait(self):
-        return self.wait_time/self.processes[self.index].getBurstNum()
+        return self.wait_time/self.processes[ord(self.current.getName())-65].getBurstNum()
     
     def getcs(self):
         return self.cs_num

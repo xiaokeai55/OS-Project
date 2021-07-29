@@ -65,8 +65,8 @@ if __name__ == '__main__':
     t_slice = int(sys.argv[7])
     rand = Rand48(seed)
     rand.srand(seed)
-    bursts = []
     for i in range(process_num):
+        bursts = []
         arrival = math.floor(next_exp(seed, Lambda, upper_bound))
         burst_num = math.ceil(rand.drand() * 100)
         for _ in range(burst_num - 1):
