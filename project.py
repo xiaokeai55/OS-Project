@@ -77,8 +77,9 @@ if __name__ == '__main__':
         processes.append(process)
     
     for i in range(process_num):
-        print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)\n'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
+        print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
         
+    print() 
     #FCFS
     fcfs = FCFS(processes, t_cs) 
     fcfs.run()
