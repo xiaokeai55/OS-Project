@@ -5,7 +5,6 @@ class Process(object):
         self.cpu = cpu
         self.bursts = bursts
         self.preemp = False
-        self.index = -1
         self.count = 0
         self.first = True
     
@@ -29,12 +28,6 @@ class Process(object):
     
     def update_arrival(self, time):
         self.arrival = time
-        
-    def setindex(self, i):
-        self.index = i
-        
-    def getindex(self):
-        return self.index
     
     def setCount(self, i):
         self.count = i

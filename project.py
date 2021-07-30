@@ -62,7 +62,7 @@ if __name__ == '__main__':
     upper_bound = int(sys.argv[4])
     t_cs = int(sys.argv[5])
     alpha = float(sys.argv[6])
-    t_slice = int(sys.argv[7])
+    t_slice = int(sys.argv[7])  
     rand = Rand48(seed)
     rand.srand(seed)
     for i in range(process_num):
