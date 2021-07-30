@@ -16,13 +16,13 @@ class FCFS(object):
         if self.process_num > 1:
             self.next_arr = self.processes[1]
         else:
-            self.next_arr = -1
+            self.next_arr = self.processes[0]
         self.nextblock = []
         self.r = False
         self.stop = 0
         self.arrival_index = 1
-        #print(self.processes[9])
-        #print(self.processes[9].getBursts())
+        #print(self.processes[5])
+        #print(self.processes[5].getBursts())
         #simout
         self.cpu_time = 0
         self.turnaround_time = 0
@@ -49,7 +49,7 @@ class FCFS(object):
                 self.arrival_index += 1
                 
     def switch(self, count):
-        self.current.setCount(count)
+        #self.current.setCount(count)
         #print('switch', self.current, self.current.getCount())
         #print(self.next_arr, self.next_arr.getCount())
         tmp = self.current
@@ -61,6 +61,7 @@ class FCFS(object):
         return ret
         
     def checkIO(self, count, time):
+        #print(self.current)
         #print('checkIO', self.current)
         #print(self.next_arr)
         ret = count
@@ -69,12 +70,12 @@ class FCFS(object):
             if len(self.nextblock) != 0 and time > self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 if not self.r and (not tmp): 
-                    if self.next_arr.getName() == self.current.getName(): ret += 1
+                    if self.nextblock[0].getName() == self.current.getName(): ret += 1
                     self.time = self.nextblock[0].getArrival()
                     tmp = True
+                self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
-                self.nextblock[0].count+=1
                 self.nextblock.pop(0)
         if tmp:
             self.time += self.t_cs
@@ -156,20 +157,10 @@ class FCFS(object):
                         self.next_arr = self.nextblock[0]
                     i = self.switch(i)
                     i = self.cs(i)
-                    continue
                 elif len(self.readyQ) != 0:
                     i = self.cs(i)
-                    continue
                 else:
                     i = self.switch(i)
-            self.time = self.current.getArrival()
-            #print('aaaaaa')
-            self.readyQ.append(self.processes[ord(self.current.getName())-65])
-            print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.time, self.current, self.checkQ()))
-            self.nextblock.pop(0)
-            self.current = self.readyQ[0]
-            i += 1
-            self.current.setCount(i)
         i = self.cs(i)
         print('time {}ms: Simulator ended for FCFS [Q {}]'.format(self.time, self.checkQ()))
         self.cpu_utilization = self.cpu_time/self.time*100

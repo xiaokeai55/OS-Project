@@ -21,6 +21,8 @@ class Process(object):
         return self.arrival
     
     def __lt__(self, p):
+        if self.arrival == p.getArrival():
+            return self.id < p.getName()
         return self.arrival < p.getArrival()
     
     def __str__(self):
