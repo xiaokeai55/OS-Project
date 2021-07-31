@@ -7,6 +7,31 @@ class Process(object):
         self.preemp = False
         self.count = 0
         self.first = True
+
+        self.predict_bursts = None
+        def SJF_compare(self,p2):
+            if self.predict_bursts == p2.predictBursts():
+                return self.id < p2.getName()
+            return self.predict_bursts < p2.predictBursts()
+        def FCFS_compare(self,p):
+            if self.arrival == p.getArrival():
+                return self.id < p.getName()
+            return self.arrival < p.getArrival()
+            
+        self.compare2 = SJF_compare
+        self.compare_process = FCFS_compare
+    
+    def getC2(self):
+        return self.compare2
+ 
+    def setCompareProcess(self, c):
+        self.compare_process = c
+
+    def setPredictBursts(self,c):
+        self.predict_bursts = c
+
+    def predictBursts(self):
+        return self.predict_bursts
     
     def getName(self):
         return self.id
@@ -19,11 +44,9 @@ class Process(object):
     
     def getArrival(self):
         return self.arrival
-    
+
     def __lt__(self, p):
-        if self.arrival == p.getArrival():
-            return self.id < p.getName()
-        return self.arrival < p.getArrival()
+        return self.compare_process(self, p)
     
     def __str__(self):
         return self.id

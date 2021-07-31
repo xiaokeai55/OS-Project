@@ -1,5 +1,6 @@
 from Process import*
 from FCFS import*
+from SJF import*
 from RR import*
 import sys
 import math
@@ -87,8 +88,10 @@ if __name__ == '__main__':
     print()
     
     #SJF
-    
-    #print()
+    sjf = SJF(processes, t_cs, alpha, Lambda)
+    sjf.run()
+    simout(sjf)  
+    print()
     
     #SRT
     
