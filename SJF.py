@@ -154,8 +154,8 @@ class SJF(object):
                 print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]'
                     .format(self.time, self.current, self.current.predictBursts(), self.total[ord(self.current.getName())-65], self.checkQ()))
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
-                print('time {}ms: Recalculated tau from {}ms to {}ms for process {}'
-                    .format(self.time, self.current.predictBursts(), rec, self.current))
+                print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
+                    .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
                 self.current.setPredictBursts(rec)
                 
             elif self.total[ord(self.current.getName())-65] == 0: 
@@ -170,8 +170,8 @@ class SJF(object):
             else: 
                 print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.current.predictBursts(),self.total[ord(self.current.getName())-65], self.checkQ()))
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
-                print('time {}ms: Recalculated tau from {}ms to {}ms for process {}'
-                    .format(self.time, self.current.predictBursts(), rec, self.current))
+                print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
+                    .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
                 self.current.setPredictBursts(rec)
                 
 

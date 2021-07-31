@@ -82,10 +82,10 @@ if __name__ == '__main__':
         
     print() 
     #FCFS
-    fcfs = FCFS(processes, t_cs) 
-    fcfs.run()
-    simout(fcfs)
-    print()
+    #fcfs = FCFS(processes, t_cs) 
+    #fcfs.run()
+    #simout(fcfs)
+    #print()
     
     #SJF
     sjf = SJF(processes, t_cs, alpha, Lambda)
