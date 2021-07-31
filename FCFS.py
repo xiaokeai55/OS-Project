@@ -23,6 +23,7 @@ class FCFS(object):
         self.arrival_index = 1
         #print(self.processes[5])
         #print(self.processes[5].getBursts())
+        
         #simout
         self.cpu_time = 0
         self.turnaround_time = 0
@@ -141,7 +142,6 @@ class FCFS(object):
             i += 1
             self.current.setCount(i)
             block = self.time + self.bursts[i] + self.t_cs
-            self.wait_time += self.bursts[i]
             self.current.update_arrival(block)
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             #print(self.current.getName(),self.current.getArrival())
