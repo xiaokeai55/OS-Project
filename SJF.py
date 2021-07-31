@@ -56,7 +56,7 @@ class SJF(object):
             if self.arrival_index < self.process_num and self.processes[self.arrival_index].getArrival() < time and self.processes[self.arrival_index].isfirst():
                 self.readyQ.append(self.processes[self.arrival_index])
                 self.readyQ = sorted(self.readyQ)
-                print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.checkQ()))
+                print('time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.processes[self.arrival_index].predictBursts(), self.checkQ()))
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
                 
@@ -185,6 +185,7 @@ class SJF(object):
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             self.nextblock.append(self.current)
             self.nextblock.sort()
+            print(self.nextblock[0])
             self.checkArrival(self.time)
             if self.next_arr != -1:
                 if self.next_arr.getName() != self.nextblock[0].getName():

@@ -1,7 +1,7 @@
 Process A (arrival time 9 ms) 16 CPU bursts (tau 100ms)
 
 time 0ms: Simulator started for SJF [Q empty]
-time 9ms: Process A (tau 100ms) arrived; added to ready queue [Q A]
+time 9ms: Process A arrived; added to ready queue [Q 100]
 time 11ms: Process A (tau 100ms) started using the CPU for 56ms burst [Q empty]
 time 67ms: Process A (tau 100ms) completed a CPU burst; 15 bursts to go [Q empty]
 time 67ms: Recalculated tau from 100ms to 78ms for process A [Q empty]
