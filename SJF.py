@@ -98,7 +98,7 @@ class SJF(object):
 
         #set each process compare method to SJF_compare
         for i in range(self.process_num):
-            self.processes[i].setPredictBursts(100)
+            self.processes[i].setPredictBursts(int(1/self.Lambda))
             self.processes[i].setCompareProcess(self.processes[i].getC2())
 
         
@@ -178,14 +178,18 @@ class SJF(object):
             self.r = False
             i += 1
             self.current.setCount(i)
-
+            
             block = self.time + self.bursts[i] + self.t_cs
             self.wait_time += self.bursts[i]
             self.current.update_arrival(block)
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             self.nextblock.append(self.current)
+            for n in self.nextblock:
+                n.setCompareProcess(n.getC1())
             self.nextblock.sort()
-            print(self.nextblock[0])
+            for n in self.nextblock:
+                n.setCompareProcess(n.getC2())
+
             self.checkArrival(self.time)
             if self.next_arr != -1:
                 if self.next_arr.getName() != self.nextblock[0].getName():
