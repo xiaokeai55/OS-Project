@@ -7,6 +7,7 @@ class Process(object):
         self.preemp = False
         self.count = 0
         self.first = True
+        self.remaining = None
 
         self.predict_bursts = None
         def SJF_compare(self,p2):
@@ -17,13 +18,29 @@ class Process(object):
             if self.arrival == p.getArrival():
                 return self.id < p.getName()
             return self.arrival < p.getArrival()
+
+        def SRT_compare(self,p):
+            if self.remaining == p.getRem():
+                return self.id < p.getName()
+            return self.remaining < p.getRem()
             
         self.compare2 = SJF_compare
+        self.compare1 = FCFS_compare
+        self.compare3 = SRT_compare
         self.compare_process = FCFS_compare
     
     def getC2(self):
         return self.compare2
- 
+
+    def getC3(self):
+        return self.compare3
+
+    def getC1(self):
+        return self.compare1
+    
+    def getRem(self):
+        return self.remaining
+
     def setCompareProcess(self, c):
         self.compare_process = c
 
