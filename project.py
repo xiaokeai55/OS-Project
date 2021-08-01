@@ -85,8 +85,8 @@ if __name__ == '__main__':
 
     f = open('simout.txt', 'w')
     #FCFS
-    fcfs = FCFS(processes, t_cs) 
-    fcfs.run()
+    #fcfs = FCFS(processes, t_cs) 
+    #fcfs.run()
     #simout(fcfs)
     #print()
     
@@ -105,8 +105,8 @@ if __name__ == '__main__':
     #print()
     
     #RR
-    #rr = RR(processes, t_cs, t_slice)
-    #rr.run()
+    rr = RR(processes, t_cs, t_slice)
+    rr.run()
 
     f.close()
         
