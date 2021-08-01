@@ -141,31 +141,31 @@ class SRT(object):
         self.current.notfirst()
         i = 0
         while 1:
-            i = self.checkIO(i, self.time)
+            i = self.checkIO(i, self.time, False)
             self.checkArrival(self.time)
             i = self.checkIO(i, self.time)
             if(len(self.readyQ) == 0):
                 self.time = self.nextblock[0].getArrival()
                 i = self.switch(i)
-                i = self.checkIO(i, self.time + self.t_cs)
+                i = self.checkIO(i, self.time, True)
                 i = self.switch(i)
                 self.current = self.readyQ[0]
                 i = self.readyQ[0].getCount()
                 self.bursts = self.readyQ[0].getBursts()
                 self.readyQ.pop(0)
             else:
+                i = self.cs(i, True)
                 self.current = self.readyQ[0]
                 i = self.readyQ[0].getCount()
                 self.bursts = self.readyQ[0].getBursts()
                 self.readyQ.pop(0)
-                i = self.cs(i)
                 
             print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
                   .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
             self.r = True
             self.cpu_time += self.bursts[i]
             self.checkArrival(self.time + self.t_cs)
-            i = self.checkIO(i, self.time + self.bursts[i])
+            i = self.checkIO(i, self.time + self.bursts[i], False)
             self.time += self.bursts[i]
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
@@ -186,7 +186,7 @@ class SRT(object):
                 i = self.current.getCount()
                 self.bursts = deepcopy(self.current.getBursts())
                 self.r = False
-                i = self.cs(i)
+                i = self.cs(i, False)
                 continue
             else: 
                 print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.current.predictBursts(),self.total[ord(self.current.getName())-65], self.checkQ()))
@@ -217,12 +217,12 @@ class SRT(object):
                     if self.next_arr.getArrival() > self.nextblock[0].getArrival():
                         self.next_arr = self.nextblock[0]
                     i = self.switch(i)
-                    i = self.cs(i)
+                    i = self.cs(i, False)
                 elif len(self.readyQ) != 0:
-                    i = self.cs(i)
+                    i = self.cs(i, False)
                 else:
                     i = self.switch(i)
-        i = self.cs(i)
+        i = self.cs(i, False)
         print('time {}ms: Simulator ended for SRT [Q {}]'.format(self.time, self.checkQ()))
         self.cpu_utilization = self.cpu_time/self.time*100
         

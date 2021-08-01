@@ -104,8 +104,8 @@ class SJF(object):
         if tmp:
             self.time += self.t_cs
         if tmp2:
-            self.readyQ.insert(0, tmp_burst)
             self.readyQ = sorted(self.readyQ)
+            self.readyQ.insert(0, tmp_burst)
         return ret
 
     def cs(self, count, s):
@@ -148,7 +148,7 @@ class SJF(object):
             if(len(self.readyQ) == 0):
                 self.time = self.nextblock[0].getArrival()
                 i = self.switch(i)
-                i = self.checkIO(i, self.time + self.t_cs, True)
+                i = self.checkIO(i, self.time, True)
                 i = self.switch(i)
                 self.current = self.readyQ[0]
                 i = self.readyQ[0].getCount()
