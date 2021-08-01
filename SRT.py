@@ -71,10 +71,23 @@ class SRT(object):
         ret = self.current.getCount()
         return ret
         
-    def checkIO(self, count, time):
+    def checkIO(self, count, time, cs):
         ret = count
         tmp = False
-        for _ in range(len(self.nextblock)):
+        tmp2 = False
+        if cs:
+            while len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
+                self.checkArrival(self.nextblock[0].getArrival())
+                tmp = True
+                self.nextblock[0].count+=1
+                self.readyQ.append(self.nextblock[0])
+                print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.nextblock[0].predictBursts(), self.checkQ()))
+                self.nextblock.pop(0)
+            if len(self.readyQ) != 0:
+                tmp2 = True
+                tmp_burst = self.readyQ.pop(0)
+            time+=self.t_cs
+        for i in range(len(self.nextblock)):
             if len(self.nextblock) != 0 and time > self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 if not self.r and (not tmp): 
@@ -86,14 +99,20 @@ class SRT(object):
                 self.readyQ = sorted(self.readyQ)
                 print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
                 self.nextblock.pop(0)
+                i-=1
         if tmp:
             self.time += self.t_cs
+        if tmp2:
+            self.readyQ.insert(0, tmp_burst)
         return ret
 
-    def cs(self, count):
+    def cs(self, count, s):
         tmp = self.time
-        ret = self.checkIO(count, self.time+self.t_cs)
-        self.time = tmp+2
+        if s:
+            ret = self.checkIO(count, self.time, s)
+        else:
+            ret = self.checkIO(count, self.time+self.t_cs, s)
+        self.time = tmp+self.t_cs
         return ret
 
     def run(self):

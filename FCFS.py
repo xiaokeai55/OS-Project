@@ -69,7 +69,7 @@ class FCFS(object):
         tmp = False
         tmp2 = False
         if cs:
-            if len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
+            while len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 tmp = True
                 self.nextblock[0].count+=1

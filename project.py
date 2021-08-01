@@ -91,8 +91,8 @@ if __name__ == '__main__':
     #print()
     
     #SJF
-    #sjf = SJF(processes, t_cs, alpha, Lambda)
-    #sjf.run()
+    sjf = SJF(processes, t_cs, alpha, Lambda)
+    sjf.run()
     #simout(sjf)  
     #print()
 
@@ -105,8 +105,8 @@ if __name__ == '__main__':
     #print()
     
     #RR
-    rr = RR(processes, t_cs, t_slice)
-    rr.run()
+    #rr = RR(processes, t_cs, t_slice)
+    #rr.run()
 
     f.close()
         
