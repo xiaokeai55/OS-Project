@@ -127,15 +127,23 @@ class RR(object):
                   .format(self.time, self.current, self.bursts[i], self.checkQ()))
 
             self.r = True
+
             if self.bursts[i] > self.t_slice:
                 self.cpu_time += self.t_slice
+                self.checkArrival(self.time + self.t_cs)
+                i = self.checkIO(i, self.time + self.t_slice)
                 self.time += self.t_slice
                 self.bursts[i] -= self.t_slice
+                self.checkArrival(self.time)
+
                 if self.checkQ() == 'empty':
                     print('time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]'.format(self.time, self.checkQ()))
                     self.cpu_time += self.bursts[i]
+                    self.checkArrival(self.time + self.t_cs)
+                    i = self.checkIO(i, self.time + self.bursts[i])
                     self.time += self.bursts[i]
                     self.total[ord(self.current.getName()) - 65]-=1
+                    self.checkArrival(self.time)
                 else:
                     self.readyQ.append(self.current)
                     if i < 2: i = 0
@@ -143,10 +151,11 @@ class RR(object):
                     continue
             else:
                 self.cpu_time += self.bursts[i]
+                self.checkArrival(self.time + self.t_cs)
+                i = self.checkIO(i, self.time + self.bursts[i])
                 self.time += self.bursts[i]
                 self.total[ord(self.current.getName()) - 65] -= 1
-
-
+                self.checkArrival(self.time)
 
             if self.total[ord(self.current.getName()) - 65] == 1:
                 print(
