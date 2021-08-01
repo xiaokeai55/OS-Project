@@ -70,7 +70,7 @@ class RR(object):
         tmp = False
         tmp2 = False
         if cs:
-            if len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
+            while len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 tmp = True
                 self.nextblock[0].count+=1
@@ -155,15 +155,26 @@ class RR(object):
                         self.current.remaining -= self.t_slice
                     self.checkArrival(self.time)
                     self.current.preemp = True
+                    ini = True
 
-                    if self.checkQ() == 'empty':
+                    while self.checkQ() == 'empty':
                         print('time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]'.format(self.time, self.checkQ()))
-                        self.cpu_time += self.current.remaining
+                        if self.current.remaining > self.t_slice:
+                            self.current.remaining -= self.t_slice
+                            self.cpu_time += self.t_slice
+                            self.checkArrival(self.time + self.t_slice)
+                            i = self.checkIO(i, self.time + self.t_slice, False)
+                            self.time += self.t_slice
+                            continue
+                        ini = False
                         self.checkArrival(self.time + self.t_cs)
                         i = self.checkIO(i, self.time + self.current.remaining, False)
-                    else:
+                        self.r = False
+                        break
+                    if ini or self.current.remaining > self.t_slice:
+                        ini = True
                         print('time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]'.format(self.time, self.current, self.current.remaining, self.checkQ()))
-                        self.readyQ.insert(1, self.current)
+                        self.readyQ.append(self.current)
                         self.r = False
                         i = self.cs(i, False)
                         continue
