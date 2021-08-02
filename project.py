@@ -79,7 +79,10 @@ if __name__ == '__main__':
         processes.append(process)
     
     for i in range(process_num):
-        print('Process {} (arrival time {} ms) {} CPU bursts (tau {}ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum(), int(1/Lambda)))
+        if processes[i].getBurstNum() == 1:
+            print('Process {} (arrival time {} ms) {} CPU burst (tau {}ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum(), int(1/Lambda)))
+        else:
+            print('Process {} (arrival time {} ms) {} CPU bursts (tau {}ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum(), int(1/Lambda)))
         
     print() 
 
