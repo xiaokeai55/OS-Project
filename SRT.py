@@ -118,16 +118,16 @@ class SRT(object):
                     .format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
                 else:
                     pmpt = self.nextblock[0]
-                    self.time = self.nextblock[0].getArrival() + 4
-                    # print(switch.getArrival())
+                    self.time = self.nextblock[0].getArrival() + self.t_cs
                     # print(spend)
                     # print(self.nextblock[0].getRem(), switch.getRem())
                     print('time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]'
                         .format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), switch, self.checkQ()))
                     self.readyQ.append(switch)
                     self.readyQ = sorted(self.readyQ)
-
-                
+                    self.time+=self.t_cs
+                    self.nextblock.pop(0)
+                    break
                 self.nextblock.pop(0)
                 i-=1
         if pmpt != None:
