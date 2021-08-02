@@ -75,34 +75,67 @@ class SRT(object):
         ret = count
         tmp = False
         tmp2 = False
+        pmpt = None
         if cs:
             while len(self.nextblock) != 0 and time == self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 tmp = True
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
+                self.readyQ = sorted(self.readyQ)
                 print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.nextblock[0].predictBursts(), self.checkQ()))
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
                 tmp2 = True
                 tmp_burst = self.readyQ.pop(0)
-            time+=self.t_cs
+                time += self.t_cs
         for i in range(len(self.nextblock)):
             if len(self.nextblock) != 0 and time > self.nextblock[0].getArrival():
                 self.checkArrival(self.nextblock[0].getArrival())
                 if not self.r and (not tmp): 
                     if self.nextblock[0].getName() == self.current.getName(): ret += 1
+
                     self.time = self.nextblock[0].getArrival()
                     tmp = True
+                
+                tP = False
+                spend  = self.nextblock[0].getArrival() - self.current.getStartTime()
+                self.current.setRemaining(self.current.getRem() - spend)
+
+                switch = self.nextblock[0]
+                if self.nextblock[0].getRem() < self.current.getRem():
+                    tP = True
+                    self.current.setSpending(spend)
+                    switch = self.current
+                    self.current = self.nextblock[0]
+
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 self.readyQ = sorted(self.readyQ)
-                print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
+
+                if tP != True:
+                    print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'
+                    .format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
+                else:
+                    pmpt = self.nextblock[0]
+                    self.time = self.nextblock[0].getArrival() + 4
+                    # print(switch.getArrival())
+                    # print(spend)
+                    # print(self.nextblock[0].getRem(), switch.getRem())
+                    print('time {}ms: Process {} (tau {}ms) completed I/O; preempting {} [Q {}]'
+                        .format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), switch, self.checkQ()))
+                    self.readyQ.append(switch)
+                    self.readyQ = sorted(self.readyQ)
+
+                
                 self.nextblock.pop(0)
                 i-=1
+        if pmpt != None:
+            self.readyQ.remove(pmpt)
         if tmp:
             self.time += self.t_cs
         if tmp2:
+            self.readyQ = sorted(self.readyQ)
             self.readyQ.insert(0, tmp_burst)
         return ret
 
@@ -120,7 +153,8 @@ class SRT(object):
         #set each process compare method to SRT_compare
         for i in range(self.process_num):
             self.processes[i].setPredictBursts(int(1/self.Lambda))
-            self.processes[i].setCompareProcess(self.processes[i].getC2())
+            self.processes[i].setRemaining(int(1/self.Lambda))
+            self.processes[i].setCompareProcess(self.processes[i].getC3())
 
         
         self.current = self.processes[0]
@@ -143,7 +177,6 @@ class SRT(object):
         while 1:
             i = self.checkIO(i, self.time, False)
             self.checkArrival(self.time)
-            i = self.checkIO(i, self.time)
             if(len(self.readyQ) == 0):
                 self.time = self.nextblock[0].getArrival()
                 i = self.switch(i)
@@ -159,14 +192,42 @@ class SRT(object):
                 i = self.readyQ[0].getCount()
                 self.bursts = self.readyQ[0].getBursts()
                 self.readyQ.pop(0)
-                
-            print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
-                  .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
+
+            self.current.setStartTime(self.time)
+            if(self.current.getSpending() == 0):
+                print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
+                    .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
+            else:
+
+                print('time {}ms: Process {} (tau {}ms) started using the CPU for remaining {}ms of {}ms burst [Q {}]'\
+                    .format(self.time, self.current, self.current.predictBursts(), 
+                            self.bursts[i]-self.current.getSpending(), self.bursts[i], self.checkQ()))
+                #self.time -= self.current.getSpending()
+
             self.r = True
             self.cpu_time += self.bursts[i]
+            
             self.checkArrival(self.time + self.t_cs)
+
+            ###
+            tCurrent = self.current 
             i = self.checkIO(i, self.time + self.bursts[i], False)
-            self.time += self.bursts[i]
+            if self.current!= tCurrent:
+                i = self.current.getCount()
+                self.bursts = self.current.getBursts()
+                print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
+                  .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
+                self.r = True
+                self.cpu_time += self.bursts[i]
+            
+            self.checkArrival(self.time + self.t_cs)
+            self.time += self.bursts[i] - self.current.getSpending()
+            
+            # if self.current.getSpending() != 0 : 
+
+            #     print(self.bursts[i])
+            #     print(self.current.getSpending())
+
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
             if self.total[ord(self.current.getName())-65] == 1:
@@ -176,7 +237,9 @@ class SRT(object):
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
                 print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
                     .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
+                self.current.setSpending(0)
                 self.current.setPredictBursts(rec)
+                self.current.setRemaining(rec)
                 
             elif self.total[ord(self.current.getName())-65] == 0: 
                 print('time {}ms: Process {} terminated [Q {}]'.format(self.time, self.current, self.checkQ()))
@@ -193,7 +256,9 @@ class SRT(object):
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
                 print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
                     .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
+                self.current.setSpending(0)
                 self.current.setPredictBursts(rec)
+                self.current.setRemaining(rec)
                 
 
             self.r = False
@@ -201,7 +266,6 @@ class SRT(object):
             self.current.setCount(i)
             
             block = self.time + self.bursts[i] + self.t_cs
-            self.wait_time += self.bursts[i]
             self.current.update_arrival(block)
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             self.nextblock.append(self.current)
@@ -244,4 +308,3 @@ class SRT(object):
     
     def getutilization(self):
         return self.cpu_utilization
-    
