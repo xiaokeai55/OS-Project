@@ -223,6 +223,7 @@ class SJF(object):
                     i = self.cs(i, False)
                 else:
                     i = self.switch(i)
+                    i = self.cs(i, False)
         i = self.cs(i, False)
         print('time {}ms: Simulator ended for SJF [Q {}]'.format(self.time, self.checkQ()))
         self.cpu_utilization = self.cpu_time/self.time*100

@@ -45,6 +45,7 @@ class FCFS(object):
         for _ in range(self.process_num):
             if self.arrival_index < self.process_num and self.processes[self.arrival_index].getArrival() < time and self.processes[self.arrival_index].isfirst():
                 self.readyQ.append(self.processes[self.arrival_index])
+                self.turnaround_time -= self.time
                 print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.checkQ()))
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
@@ -74,6 +75,7 @@ class FCFS(object):
                 tmp = True
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
+                self.turnaround_time -= self.time
                 print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
@@ -89,6 +91,7 @@ class FCFS(object):
                     tmp = True
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
+                self.turnaround_time -= self.time
                 print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
                 self.nextblock.pop(0)
                 i-=1
@@ -113,6 +116,7 @@ class FCFS(object):
         self.readyQ.append(self.processes[0])
         self.current = self.readyQ[0]
         print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.time, self.current, self.checkQ()))
+        self.turnaround_time -= self.time
         self.current.notfirst()
         i = 0
         while 1:
@@ -120,8 +124,6 @@ class FCFS(object):
             self.checkArrival(self.time)
             if len(self.readyQ) == 0:
                 self.time = self.nextblock[0].getArrival()
-                #print(self.nextblock[0])
-                #print(self.next_arr)
                 i = self.switch(i)
                 i = self.checkIO(i, self.time, True)
                 i = self.switch(i)
@@ -140,12 +142,14 @@ class FCFS(object):
             self.r = True
             self.cpu_time += self.bursts[i]
             self.checkArrival(self.time + self.t_cs)
+            self.cs_num+=1
             i = self.checkIO(i, self.time + self.bursts[i], False)
             self.time += self.bursts[i]
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
             if self.total[ord(self.current.getName())-65] == 1: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
             elif self.total[ord(self.current.getName())-65] == 0: 
+                self.turnaround_time = self.turnaround_time+self.time+self.t_cs
                 print('time {}ms: Process {} terminated [Q {}]'.format(self.time, self.current, self.checkQ()))
                 self.stop+=1
                 if self.stop == self.process_num: break
@@ -161,14 +165,11 @@ class FCFS(object):
             self.current.setCount(i)
             block = self.time + self.bursts[i] + self.t_cs
             self.current.update_arrival(block)
+            self.turnaround_time = self.turnaround_time+self.time+self.t_cs
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
-            #print(self.current.getName(),self.current.getArrival())
             self.nextblock.append(self.current)
             self.nextblock.sort()
-            #print(self.nextblock[0])
             self.checkArrival(self.time)
-            #print('nextblock'+self.nextblock[0].getName())
-            #print('nextarr'+self.next_arr.getName())
             if self.next_arr != -1:
                 if self.next_arr.getName() != self.nextblock[0].getName():
                     if self.next_arr.getArrival() > self.nextblock[0].getArrival():

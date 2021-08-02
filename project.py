@@ -85,23 +85,22 @@ if __name__ == '__main__':
 
     f = open('simout.txt', 'w')
     #FCFS
-    #fcfs = FCFS(processes, t_cs) 
-    #fcfs.run()
-    #simout(fcfs)
+    fcfs = FCFS(processes, t_cs) 
+    fcfs.run()
+    simout(fcfs, "FCFS")
     #print()
     
     #SJF
-    sjf = SJF(processes, t_cs, alpha, Lambda)
-    sjf.run()
+    #sjf = SJF(processes, t_cs, alpha, Lambda)
+    #sjf.run()
     #simout(sjf)  
     #print()
 
     
     #SRT
-    # srt = SRT(processes, t_cs, alpha, Lambda)
-    # srt.run()
-    # simout(srt,"SRT")  
-    # print()
+    #srt = SRT(processes, t_cs, alpha, Lambda)
+    #srt.run()
+    #simout(srt,"SRT")  
     #print()
     
     #RR
