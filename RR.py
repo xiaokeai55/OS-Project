@@ -22,8 +22,6 @@ class RR(object):
         self.r = False
         self.stop = 0
         self.arrival_index = 1
-        #print(self.processes[0])
-        #print(self.processes[0].getBursts())
         
         #simout
         self.cpu_time = 0
@@ -47,13 +45,11 @@ class RR(object):
             if self.arrival_index < self.process_num and self.processes[self.arrival_index].getArrival() < time and self.processes[self.arrival_index].isfirst():
                 self.readyQ.append(self.processes[self.arrival_index])
                 print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.checkQ()))
+                self.wait_time = self.wait_time - self.processes[self.arrival_index].getArrival()
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
                 
     def switch(self, count):
-        #self.current.setCount(count)
-        #print('switch', self.current, self.current.getCount())
-        #print(self.next_arr, self.next_arr.getCount())
         tmp = self.current
         self.current = self.next_arr
         self.next_arr = tmp
@@ -63,9 +59,6 @@ class RR(object):
         return ret
         
     def checkIO(self, count, time, cs):
-        #print(self.current)
-        #print('checkIO', self.current)
-        #print(self.next_arr)
         ret = count
         tmp = False
         tmp2 = False
@@ -76,6 +69,7 @@ class RR(object):
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
+                self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
                 tmp2 = True
@@ -91,6 +85,7 @@ class RR(object):
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
+                self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
                 i-=1
         if tmp:
@@ -114,6 +109,7 @@ class RR(object):
         self.readyQ.append(self.processes[0])
         self.current = self.readyQ[0]
         print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.time, self.current, self.checkQ()))
+        self.wait_time = self.wait_time - self.time
         self.current.notfirst()
         i = 0
         while 1:
@@ -121,8 +117,6 @@ class RR(object):
             self.checkArrival(self.time)
             if len(self.readyQ) == 0:
                 self.time = self.nextblock[0].getArrival()
-                #print(self.nextblock[0])
-                #print(self.next_arr)
                 i = self.switch(i)
                 i = self.checkIO(i, self.time, True)
                 i = self.switch(i)
@@ -136,6 +130,7 @@ class RR(object):
                 self.bursts = self.readyQ[0].getBursts()
                 i = self.cs(i, True)
                 self.readyQ.pop(0)
+            self.wait_time = self.wait_time + self.time - self.t_cs
             if self.current.preemp:
                 print('time {}ms: Process {} started using the CPU for remaining {}ms of {}ms burst [Q {}]'\
                   .format(self.time, self.current, self.current.remaining, self.bursts[i], self.checkQ()))
@@ -143,6 +138,7 @@ class RR(object):
                 print('time {}ms: Process {} started using the CPU for {}ms burst [Q {}]'\
                       .format(self.time, self.current, self.bursts[i], self.checkQ()))
             self.r = True
+            self.cs_num+=1
             if self.bursts[i] > self.t_slice:
                 if self.current.remaining == None or self.current.remaining > self.t_slice:
                     self.cpu_time += self.t_slice
@@ -174,6 +170,8 @@ class RR(object):
                     if ini or self.current.remaining > self.t_slice:
                         ini = True
                         print('time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]'.format(self.time, self.current, self.current.remaining, self.checkQ()))
+                        self.wait_time = self.wait_time - self.time - self.t_cs
+                        self.preemp+=1
                         self.readyQ.append(self.current)
                         self.r = False
                         i = self.cs(i, False)
@@ -182,11 +180,13 @@ class RR(object):
             if self.current.preemp:
                 i = self.checkIO(i, self.time + self.current.remaining, False)
                 self.time += self.current.remaining
+                self.cpu_time += self.current.remaining
                 self.current.remaining = None
                 self.current.preemp = False
             else: 
                 i = self.checkIO(i, self.time + self.bursts[i], False)
                 self.time += self.bursts[i]
+                self.cpu_time += self.bursts[i]
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
             if self.total[ord(self.current.getName())-65] == 1: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
@@ -207,13 +207,9 @@ class RR(object):
             block = self.time + self.bursts[i] + self.t_cs
             self.current.update_arrival(block)
             print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
-            #print(self.current.getName(),self.current.getArrival())
             self.nextblock.append(self.current)
             self.nextblock.sort()
-            #print(self.nextblock[0])
             self.checkArrival(self.time)
-            #print('nextblock'+self.nextblock[0].getName())
-            #print('nextarr'+self.next_arr.getName())
             if self.next_arr != -1:
                 if self.next_arr.getName() != self.nextblock[0].getName():
                     if self.next_arr.getArrival() > self.nextblock[0].getArrival():
@@ -227,15 +223,16 @@ class RR(object):
         i = self.cs(i, False)
         print('time {}ms: Simulator ended for RR [Q {}]'.format(self.time, self.checkQ()))
         self.cpu_utilization = self.cpu_time/self.time*100
+        self.turnaround_time = self.wait_time+self.cpu_time+self.t_cs*self.cs_num*2
         
     def getcpu(self):
-        return self.cpu_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.cpu_time/(self.cs_num-self.preemp)
     
     def getturn(self):
-        return self.turnaround_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.turnaround_time/(self.cs_num-self.preemp)
     
     def getwait(self):
-        return self.wait_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.wait_time/(self.cs_num-self.preemp)
     
     def getcs(self):
         return self.cs_num

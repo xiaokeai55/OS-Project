@@ -59,6 +59,7 @@ class SJF(object):
                 self.readyQ.append(self.processes[self.arrival_index])
                 self.readyQ = sorted(self.readyQ)
                 print('time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.processes[self.arrival_index].predictBursts(), self.checkQ()))
+                self.wait_time = self.wait_time - self.processes[self.arrival_index].getArrival()
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
                 
@@ -83,6 +84,7 @@ class SJF(object):
                 self.readyQ.append(self.nextblock[0])
                 self.readyQ = sorted(self.readyQ)
                 print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.nextblock[0].predictBursts(), self.checkQ()))
+                self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
                 tmp2 = True
@@ -99,6 +101,7 @@ class SJF(object):
                 self.readyQ.append(self.nextblock[0])
                 self.readyQ = sorted(self.readyQ)
                 print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
+                self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
                 i-=1
         if tmp:
@@ -140,6 +143,7 @@ class SJF(object):
 
         print('time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]'
             .format(self.time, self.current, self.current.predictBursts(),self.checkQ()))
+        self.wait_time = self.wait_time - self.time
         self.current.notfirst()
         i = 0
         while 1:
@@ -161,9 +165,11 @@ class SJF(object):
                 self.bursts = self.readyQ[0].getBursts()
                 self.readyQ.pop(0)
                 
+            self.wait_time = self.wait_time + self.time - self.t_cs
             print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
                   .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
             self.r = True
+            self.cs_num+=1
             self.cpu_time += self.bursts[i]
             
             self.checkArrival(self.time + self.t_cs)
@@ -227,15 +233,16 @@ class SJF(object):
         i = self.cs(i, False)
         print('time {}ms: Simulator ended for SJF [Q {}]'.format(self.time, self.checkQ()))
         self.cpu_utilization = self.cpu_time/self.time*100
+        self.turnaround_time = self.wait_time+self.cpu_time+self.t_cs*self.cs_num*2
         
     def getcpu(self):
-        return self.cpu_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.cpu_time/self.cs_num
     
     def getturn(self):
-        return self.turnaround_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.turnaround_time/self.cs_num
     
     def getwait(self):
-        return self.wait_time/self.processes[ord(self.current.getName())-65].getBurstNum()
+        return self.wait_time/self.cs_num
     
     def getcs(self):
         return self.cs_num
