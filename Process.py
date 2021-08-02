@@ -1,3 +1,5 @@
+
+  
 class Process(object):
     def __init__(self, ID, arrival, cpu, bursts):
         self.id = ID
@@ -8,6 +10,8 @@ class Process(object):
         self.count = 0
         self.first = True
         self.remaining = None
+        self.startTime = 0
+        self.spend = 0
 
         self.predict_bursts = None
         def SJF_compare(self,p2):
@@ -41,11 +45,25 @@ class Process(object):
     def getRem(self):
         return self.remaining
 
+    def getStartTime(self):
+        return self.startTime
+
+    def getSpending(self):
+        return self.spend
+
+    def setSpending(self,c):
+        self.spend = c
     def setCompareProcess(self, c):
         self.compare_process = c
 
+    def setStartTime(self, c):
+        self.startTime = c
+
     def setPredictBursts(self,c):
         self.predict_bursts = c
+
+    def setRemaining(self,c):
+        self.remaining = c
 
     def predictBursts(self):
         return self.predict_bursts
