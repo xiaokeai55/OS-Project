@@ -58,7 +58,8 @@ class SJF(object):
             if self.arrival_index < self.process_num and self.processes[self.arrival_index].getArrival() < time and self.processes[self.arrival_index].isfirst():
                 self.readyQ.append(self.processes[self.arrival_index])
                 self.readyQ = sorted(self.readyQ)
-                print('time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.processes[self.arrival_index].predictBursts(), self.checkQ()))
+                if self.processes[self.arrival_index].getArrival()<1000:
+                    print('time {}ms: Process {} (tau {}ms) arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.processes[self.arrival_index].predictBursts(), self.checkQ()))
                 self.wait_time = self.wait_time - self.processes[self.arrival_index].getArrival()
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
@@ -83,7 +84,8 @@ class SJF(object):
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 self.readyQ = sorted(self.readyQ)
-                print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.nextblock[0].predictBursts(), self.checkQ()))
+                if self.nextblock[0].getArrival()<1000:
+                    print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.nextblock[0].predictBursts(), self.checkQ()))
                 self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
@@ -100,7 +102,8 @@ class SJF(object):
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
                 self.readyQ = sorted(self.readyQ)
-                print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
+                if self.nextblock[0].getArrival()<1000:
+                    print('time {}ms: Process {} (tau {}ms) completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0],self.nextblock[0].predictBursts(), self.checkQ()))
                 self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
                 i-=1
@@ -166,7 +169,8 @@ class SJF(object):
                 self.readyQ.pop(0)
                 
             self.wait_time = self.wait_time + self.time - self.t_cs
-            print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
+            if self.time<1000:
+                print('time {}ms: Process {} (tau {}ms) started using the CPU for {}ms burst [Q {}]'\
                   .format(self.time, self.current, self.current.predictBursts(), self.bursts[i], self.checkQ()))
             self.r = True
             self.cs_num+=1
@@ -178,12 +182,13 @@ class SJF(object):
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
             if self.total[ord(self.current.getName())-65] == 1:
-                
-                print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]'
-                    .format(self.time, self.current, self.current.predictBursts(), self.total[ord(self.current.getName())-65], self.checkQ()))
+                if self.time<1000:
+                    print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} burst to go [Q {}]'
+                        .format(self.time, self.current, self.current.predictBursts(), self.total[ord(self.current.getName())-65], self.checkQ()))
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
-                print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
-                    .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
+                if self.time<1000:
+                    print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
+                        .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
                 self.current.setPredictBursts(rec)
                 
             elif self.total[ord(self.current.getName())-65] == 0: 
@@ -197,9 +202,9 @@ class SJF(object):
                 i = self.cs(i, False)
                 continue
             else: 
-                print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.current.predictBursts(),self.total[ord(self.current.getName())-65], self.checkQ()))
+                if self.time<1000: print('time {}ms: Process {} (tau {}ms) completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.current.predictBursts(),self.total[ord(self.current.getName())-65], self.checkQ()))
                 rec = self.calc_predict(self.alpha, self.bursts[i], self.current.predictBursts())
-                print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
+                if self.time<1000: print('time {}ms: Recalculated tau from {}ms to {}ms for process {} [Q {}]'
                     .format(self.time, self.current.predictBursts(), rec, self.current, self.checkQ()))
                 self.current.setPredictBursts(rec)
                 
@@ -210,7 +215,7 @@ class SJF(object):
             
             block = self.time + self.bursts[i] + self.t_cs
             self.current.update_arrival(block)
-            print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
+            if self.time<1000: print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             self.nextblock.append(self.current)
             for n in self.nextblock:
                 n.setCompareProcess(n.getC1())

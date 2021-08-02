@@ -44,7 +44,7 @@ class RR(object):
         for _ in range(self.process_num):
             if self.arrival_index < self.process_num and self.processes[self.arrival_index].getArrival() < time and self.processes[self.arrival_index].isfirst():
                 self.readyQ.append(self.processes[self.arrival_index])
-                print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.checkQ()))
+                if self.processes[self.arrival_index].getArrival()<1000: print('time {}ms: Process {} arrived; added to ready queue [Q {}]'.format(self.processes[self.arrival_index].getArrival(), self.processes[self.arrival_index], self.checkQ()))
                 self.wait_time = self.wait_time - self.processes[self.arrival_index].getArrival()
                 self.processes[self.arrival_index].notfirst()
                 self.arrival_index += 1
@@ -68,7 +68,7 @@ class RR(object):
                 tmp = True
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
-                print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
+                if self.nextblock[0].getArrival()<1000: print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
                 self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
             if len(self.readyQ) != 0:
@@ -84,7 +84,7 @@ class RR(object):
                     tmp = True
                 self.nextblock[0].count+=1
                 self.readyQ.append(self.nextblock[0])
-                print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
+                if self.nextblock[0].getArrival()<1000: print('time {}ms: Process {} completed I/O; added to ready queue [Q {}]'.format(self.nextblock[0].getArrival(), self.nextblock[0], self.checkQ()))
                 self.wait_time = self.wait_time - self.nextblock[0].getArrival()
                 self.nextblock.pop(0)
                 i-=1
@@ -132,10 +132,10 @@ class RR(object):
                 self.readyQ.pop(0)
             self.wait_time = self.wait_time + self.time - self.t_cs
             if self.current.preemp:
-                print('time {}ms: Process {} started using the CPU for remaining {}ms of {}ms burst [Q {}]'\
+                if self.time<1000: print('time {}ms: Process {} started using the CPU for remaining {}ms of {}ms burst [Q {}]'\
                   .format(self.time, self.current, self.current.remaining, self.bursts[i], self.checkQ()))
             else:
-                print('time {}ms: Process {} started using the CPU for {}ms burst [Q {}]'\
+                if self.time<1000: print('time {}ms: Process {} started using the CPU for {}ms burst [Q {}]'\
                       .format(self.time, self.current, self.bursts[i], self.checkQ()))
             self.r = True
             self.cs_num+=1
@@ -154,7 +154,7 @@ class RR(object):
                     ini = True
 
                     while self.checkQ() == 'empty':
-                        print('time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]'.format(self.time, self.checkQ()))
+                        if self.time<1000: print('time {}ms: Time slice expired; no preemption because ready queue is empty [Q {}]'.format(self.time, self.checkQ()))
                         if self.current.remaining > self.t_slice:
                             self.current.remaining -= self.t_slice
                             self.cpu_time += self.t_slice
@@ -169,7 +169,7 @@ class RR(object):
                         break
                     if ini or self.current.remaining > self.t_slice:
                         ini = True
-                        print('time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]'.format(self.time, self.current, self.current.remaining, self.checkQ()))
+                        if self.time<1000: print('time {}ms: Time slice expired; process {} preempted with {}ms to go [Q {}]'.format(self.time, self.current, self.current.remaining, self.checkQ()))
                         self.wait_time = self.wait_time - self.time - self.t_cs
                         self.preemp+=1
                         self.readyQ.append(self.current)
@@ -189,7 +189,8 @@ class RR(object):
                 self.cpu_time += self.bursts[i]
             self.total[ord(self.current.getName())-65]-=1
             self.checkArrival(self.time)
-            if self.total[ord(self.current.getName())-65] == 1: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
+            if self.total[ord(self.current.getName())-65] == 1: 
+                if self.time<1000: print('time {}ms: Process {} completed a CPU burst; {} burst to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
             elif self.total[ord(self.current.getName())-65] == 0: 
                 print('time {}ms: Process {} terminated [Q {}]'.format(self.time, self.current, self.checkQ()))
                 self.stop+=1
@@ -200,13 +201,14 @@ class RR(object):
                 self.r = False
                 i = self.cs(i, False)
                 continue
-            else: print('time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
+            else: 
+                if self.time<1000: print('time {}ms: Process {} completed a CPU burst; {} bursts to go [Q {}]'.format(self.time, self.current, self.total[ord(self.current.getName())-65], self.checkQ()))
             self.r = False
             i += 1
             self.current.setCount(i)
             block = self.time + self.bursts[i] + self.t_cs
             self.current.update_arrival(block)
-            print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
+            if self.time<1000: print('time {}ms: Process {} switching out of CPU; will block on I/O until time {}ms [Q {}]'.format(self.time, self.current, block, self.checkQ()))
             self.nextblock.append(self.current)
             self.nextblock.sort()
             self.checkArrival(self.time)
