@@ -79,7 +79,7 @@ if __name__ == '__main__':
         processes.append(process)
     
     for i in range(process_num):
-        print('Process {} (arrival time {} ms) {} CPU bursts (tau 100ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum()))
+        print('Process {} (arrival time {} ms) {} CPU bursts (tau {}ms)'.format(processes[i].getName(), processes[i].getArrival(), processes[i].getBurstNum(), int(1/Lambda)))
         
     print() 
 
@@ -95,13 +95,12 @@ if __name__ == '__main__':
     sjf.run()
     simout(sjf, "SJF")  
     print()
-
     
     #SRT
-    #srt = SRT(processes, t_cs, alpha, Lambda)
-    #srt.run()
-    #simout(srt,"SRT")  
-    #print()
+    srt = SRT(processes, t_cs, alpha, Lambda)
+    srt.run()
+    simout(srt,"SRT")  
+    print()
     
     #RR
     rr = RR(processes, t_cs, t_slice)

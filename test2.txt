@@ -1,0 +1,75 @@
+---------------2 processes----------------
+Algorithm SJF
+-- average CPU burst time: 103.027 ms
+-- average wait time: 12.973 ms
+-- average turnaround time: 120.000 ms
+-- total number of context switches: 37
+-- total number of preemptions: 0
+-- CPU utilization: 23.424%
+Algorithm SRT
+-- average CPU burst time: 103.027 ms
+-- average wait time: 12.973 ms
+-- average turnaround time: 120.000 ms
+-- total number of context switches: 37
+-- total number of preemptions: 0
+-- CPU utilization: 23.424%
+---------------4 processes----------------
+Algorithm SJF
+-- average CPU burst time: 94.885 ms
+-- average wait time: 22.519 ms
+-- average turnaround time: 121.404 ms
+-- total number of context switches: 52
+-- total number of preemptions: 0
+-- CPU utilization: 30.200%
+Algorithm SRT
+-- average CPU burst time: 94.885 ms
+-- average wait time: 21.981 ms
+-- average turnaround time: 120.942 ms
+-- total number of context switches: 53
+-- total number of preemptions: 1
+-- CPU utilization: 30.316%
+---------------6 processes----------------
+Algorithm SJF
+-- average CPU burst time: 89.518 ms
+-- average wait time: 39.922 ms
+-- average turnaround time: 133.440 ms
+-- total number of context switches: 141
+-- total number of preemptions: 0
+-- CPU utilization: 29.744%
+Algorithm SRT
+-- average CPU burst time: 89.518 ms
+-- average wait time: 39.213 ms
+-- average turnaround time: 133.099 ms
+-- total number of context switches: 154
+-- total number of preemptions: 13
+-- CPU utilization: 30.095%
+---------------8 processes----------------
+Algorithm SJF
+-- average CPU burst time: 83.984 ms
+-- average wait time: 57.888 ms
+-- average turnaround time: 145.872 ms
+-- total number of context switches: 304
+-- total number of preemptions: 0
+-- CPU utilization: 35.829%
+Algorithm SRT
+-- average CPU burst time: 83.984 ms
+-- average wait time: 57.076 ms
+-- average turnaround time: 145.336 ms
+-- total number of context switches: 325
+-- total number of preemptions: 21
+-- CPU utilization: 35.595%
+---------------10 processes---------------
+Algorithm SJF
+-- average CPU burst time: 84.760 ms
+-- average wait time: 77.312 ms
+-- average turnaround time: 166.072 ms
+-- total number of context switches: 391
+-- total number of preemptions: 0
+-- CPU utilization: 45.919%
+Algorithm SRT
+-- average CPU burst time: 84.760 ms
+-- average wait time: 79.913 ms
+-- average turnaround time: 169.092 ms
+-- total number of context switches: 432
+-- total number of preemptions: 41
+-- CPU utilization: 46.130%
